@@ -4,6 +4,8 @@
  */
 
 var express = require('express');
+var redis = require('redis').createClient();
+var redis_prefix = 'barcode.';
 var barcodeLookup = require('./lib/barcode-upcdata.info.js');
 
 // Lookup plugin structure
@@ -72,19 +74,45 @@ app.get('/lookup/:barcode', function (req, res) {
 // Route parameter processors
 
 app.param('barcode', function (req, res, next, id) {
-  barcodeLookup.lookup(id, '', function (err, data) {
-    if (!err) {
-      res.data = data;
-      console.log ('We have data', data);
-      getPluginSearchResults(data, function (results) {
-        console.log ('We have search results', results);
-        res.results = results;
-        next ();
+
+  function search(data) {
+    getPluginSearchResults(data, function (results) {
+      console.log ('We have search results', results);
+      res.results = results;
+      next ();
+    });
+  }
+
+  var redis_key = redis_prefix + id;
+  console.log ('Redis key', redis_key);
+  redis.exists(redis_key, function (err, exists) {
+    if (exists == 1) {
+      redis.get(redis_key, function (err, data) {
+        data = JSON.parse(data);
+        res.data = data;
+        console.log ('We have cached data', data);
+        search(data);
       });
     } else {
-      throw Error()
+      barcodeLookup.lookup(id, '', function (err, data) {
+        if (!err) {
+          res.data = data;
+          console.log ('We have data', data);
+          var cache_data = JSON.stringify(data);
+          console.log ('Caching data', cache_data);
+          redis.set(redis_key, cache_data);
+          getPluginSearchResults(data, function (results) {
+            console.log ('We have search results', results);
+            res.results = results;
+            next ();
+          });
+        } else {
+          throw Error()
+        }
+      });
     }
   });
+
 });
 
 function getPluginSearchResults(barcodeObject, callback) {

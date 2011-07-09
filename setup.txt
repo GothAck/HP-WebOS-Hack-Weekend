@@ -18,10 +18,11 @@ curl http://npmjs.org/install.sh | sudo sh
 sudo npm install -g express
 sudo npm install -g jqtpl
 sudo npm install -g nodemon
-
+sudo npm install -g redis
 
 to run
 checkout repository
 
-export NODE_PATH=.:/usr/local/lib/node_modules/
-node app.js
+Run the following in the root directory:
+
+./run
