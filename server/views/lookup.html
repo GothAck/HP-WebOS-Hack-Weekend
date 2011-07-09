@@ -1,10 +1,10 @@
-<h2>
+<h1 style="text-align: center; padding-bottom: 1em;">
   ${name}
-</h2>
+</h1>
 <div class="results">
+  <ul data-role="listview" data-divider-theme="a">
   {{each results}}
-  <div class="plugin">
     {{partial($value) 'lookup-plugin'}}
-  </div>
   {{/each}}
+  </ul>
 </div>

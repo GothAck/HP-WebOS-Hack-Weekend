@@ -7,14 +7,17 @@
     <script type="text/javascript" src="/javascripts/jquery.mobile-1.0b1.min.js"></script>
   </head>
   <body>
-    <div id="header">
-      <img src="/images/logo.png" alt="Barcode Thing" />
-    </div>
-    <div id="app">
-      {{html body}}
-    </div>
-    <div id="footer">
-      <img src="/images/footer.png" alt="Barcode Thing" />
+    <div data-role="page">
+      <div data-role="header">
+        <a href="#" data-role="button" data-rel="back" data-icon="home" data-iconpos="notext" class="ui-btn-right">Home</a>
+        <img src="/images/logo.png" alt="Barcode Thing" />
+      </div>
+      <div data-role="content">
+          {{html body}}
+      </div>
+      <div data-role="footer">
+        <img src="/images/footer.png" alt="Barcode Thing" />
+      </div>
     </div>
   </body>
 </html>

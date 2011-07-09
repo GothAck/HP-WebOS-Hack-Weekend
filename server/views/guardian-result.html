@@ -1,3 +1,9 @@
 <li>
-  <h5><a href="${url}">${title}</a></h5>
+  <a href="${url}">
+    {{if thumburl != ""}}
+      <img src="${thumburl}" />
+    {{/if}}
+    <h3>${title}</h3>
+    <p>${text}</p>
+  </a>
 </li>
