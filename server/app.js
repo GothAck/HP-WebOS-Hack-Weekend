@@ -10,7 +10,7 @@ var barcodeLookup = require('./lib/barcode-upcdata.info.js');
 
 // Lookup plugin structure
 var pp = './lib/lookup-';
-var pluginList = ['ebay'];
+var pluginList = ['ebay', 'youtube'];
 
 var pluginsLookup = {};
 for (plugin in pluginList) {
@@ -28,9 +28,10 @@ for (plugin in pluginList) {
 
 var keywords = [
   {
+    //Find CDs
     type: 'regex',
     lookup: /^cd$/i,
-    plugins: ['ebay']
+    plugins: ['ebay', 'youtube']
   }
 ];
 
