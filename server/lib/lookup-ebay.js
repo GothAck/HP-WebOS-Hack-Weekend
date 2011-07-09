@@ -16,10 +16,15 @@ function search (term, callback) {
       response.on('end', function () {
         // process data here
         var myResultObjects = JSON.parse(data);
-        callback(false, myResultObjects) //If there is an error, callback with true as first value and data = error string
+        try {
+          myResultObjects = myResultObjects.findItemsByKeywordsResponse[0].searchResult[0].item;
+          callback(false, myResultObjects);
+        } catch (err) {
+          callback(true, ['JSON Error'])
+        }
       });
     }).on('error', function (error) {
-      callback(true, 'HTTP Error');
+      callback(true, ['HTTP Error']);
     });
 }
 

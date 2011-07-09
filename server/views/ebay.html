@@ -1,2 +1,9 @@
 <h3>Ebay!</h3>
+<div class="plugin" id="plugin-${plugin}">
+  <ul>
+  {{each results}}
+    {{partial($value) 'ebay-result'}}
+  {{/each}}
+  </ul>
+</div>
 
