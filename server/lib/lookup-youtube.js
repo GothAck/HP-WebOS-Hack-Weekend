@@ -8,7 +8,7 @@ function search (term, callback) {
     {
       host: 'gdata.youtube.com',
       port: 80,
-      path: "/feeds/api/videos?q="+querystring.escape(term)+"&alt=json&max-results=1&format=5" 
+      path: "/feeds/api/videos?q="+querystring.escape(term)+"&alt=json&max-results=3&format=5" 
     },
     function (response) {
       var data = '';
@@ -33,7 +33,9 @@ function parse_data(data) {
     results[i] = ({
       title:  item.title.$t,
       thumburl: items[i].media$group.media$thumbnail[0].url,
-      playerurl:  items[i].media$group.media$content[0].url
+      playerurl:  items[i].media$group.media$content[0].url,
+      content:  items[i].content.$t,
+      published:  items[i].published.$t
     });
   }
   return results;
