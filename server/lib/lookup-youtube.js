@@ -1,19 +1,21 @@
 // Any requires here
 
 var http = require ('http');
+var querystring = require('querystring');
 
 function search (term, callback) {
   http.get(
     {
       host: 'gdata.youtube.com',
       port: 80,
-      path: "/feeds/api/videos?q="+term+"&alt=json-in-script&callback=showMyVideos2&max-results=1format=5" 
+      path: "/feeds/api/videos?q="+querystring.escape(term)+"&alt=json-in-script&callback=showMyVideos2&max-results=1format=5" 
     },
     function (response) {
       var data = '';
       response.on('data', function (chunk) { data += chunk })
       response.on('end', function () {
         // process data here
+        data = JSON.parse(data);
         var myResultObjects = parse_data(data);
         callback(false, myResultObjects) //If there is an error, callback with true as first value and data = error string
       });
