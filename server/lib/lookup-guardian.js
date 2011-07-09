@@ -12,13 +12,14 @@ function search (term, callback) {
     },
     function (response) {
       var data = '';
-      response.on('data', function (chunk) { data += chunk })
+      response.setEncoding('utf8');
+      response.on('data', function (chunk) { data = data + chunk });
+
       response.on('end', function () {
         // process data here
-        var data =JSON.parse(data);
+        data =JSON.parse(data);
         var myResultObjects = parse_data(data);
         try {
-          myResultObjects = myResultObjects.findItemsByKeywordsResponse[0].searchResult[0].item;
           callback(false, myResultObjects);
         } catch (err) {
           callback(true, ['JSON Error'])
@@ -38,16 +39,16 @@ function api_call_url(keywords) {
     q:  keywords,
     section:  section,
     format: "json",
-    api-key:  appid,
-    order-by: "relevance",
-    show-fields:  "all"
-  })";
+    'api-key':  appid,
+    'order-by': "relevance",
+    'show-fields':  "all"
+  });
   return apicall;
 }
 
 function parse_data(data) {
   var results = [];
-  var items = data.results;
+  var items = data.response.results;
   for (var i = 0; i < 3 || i < results.length; i++) {
     var item = items[i].fields;
     results[i] = ({

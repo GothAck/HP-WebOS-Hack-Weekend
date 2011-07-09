@@ -1,0 +1,64 @@
+<html>
+  <head>
+    <script type="text/javascript" src="/javascripts/jquery-1.6.2.min.js"></script>
+  </head>
+  <body>
+    <object  id="iembedflash" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,0,0" width="640" height="480">
+      <param name="movie" value="/camcanvas.swf" />
+      <param name="quality" value="high" />
+      <param name="allowScriptAccess" value="always" />
+      <embed  allowScriptAccess="always"  id="embedflash" src="/camcanvas.swf" quality="high" width="640" height="480" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" mayscript="true"  />
+    </object><br />
+    <canvas  id="canvas" width="320" height="240"></canvas><br />
+    <script type="text/javascript">
+      var passLine = null;
+      var gCtx = null;
+      var gCanvas = null;
+      var ii = 0;
+      var jj = 0;
+      var c = 0;
+      var imagedata = null;
+
+      $(function() {
+        initCanvas(640,480);
+        setTimeout('cameraSetup(640,480)', 1500);
+      });
+      function initCanvas(ww,hh) {
+        gCanvas = $('canvas');
+        var w = ww;
+        var h = hh;
+        gCanvas.css('width', w + "px");
+        gCanvas.css('height', h + "px");
+        gCanvas[0].width = w;
+        gCanvas[0].height = h;
+        gCtx = gCanvas[0].getContext("2d");
+        gCtx.clearRect(0,0,w,h);
+        imageData = gCtx.getImageData(0,0,w,h);
+      }
+      function captureCamera() {
+        flash = $('#embedflash')[0];
+        flash.ccCapture();
+      }
+      passLine = function(stringPixels) {
+        console.log(stringPixels);
+        var coll = stringPixels.split('-');
+        for(var i=0;i<coll.length;i++) {
+          var intVal = parseInt(coll[i]);
+          r = (intVal >> 16) & 0xff;
+          g = (intVal >> 8 ) & 0xff;
+          b = (intVal      ) & 0xff;
+          imageData.data[c+0] = r;
+          imageData.data[c+1] = g;
+          imageData.data[c+2] = b;
+          imageData.data[c+3] = 255;
+          c += 4;
+        }
+        if (c >= (1*gCanvas[0].width) * (1*gCanvas[0].height) * 4) {
+          c = 0;
+          gCtx.putImageData(imageData,0,0);
+        }
+      }
+    </script>
+    <input type="button" value="Click Me" onclick="captureCamera()" />
+  </body>
+</html>

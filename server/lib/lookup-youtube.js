@@ -17,7 +17,6 @@ function search (term, callback) {
         // process data here
         data = JSON.parse(data);
         var myResultObjects = parse_data(data);
-        console.log (myResultObjects);
         callback(false, myResultObjects) //If there is an error, callback with true as first value and data = error string
       });
     }).on('error', function (error) {

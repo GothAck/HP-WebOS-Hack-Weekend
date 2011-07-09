@@ -72,7 +72,7 @@ app.get('/', function(req, res){
 });
 
 app.get('/lookup/:barcode', function (req, res) {
-  console.log (res.data);
+  console.log ('Render with data', res.results);
   res.render('lookup', {
     name: res.data.name,
     results: res.results
