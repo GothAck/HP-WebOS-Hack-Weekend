@@ -1,11 +1,13 @@
 <h2>
-  Search results:
+  ${name}
 </h2>
-
-{{each results}}
-<div class="plugin" id="plugin-">
-  {{partial($value) 'layout-plugin'}}
+<div class="results">
+  {{each results}}
+  <div class="plugin">
+    {{partial($value) 'layout-plugin'}}
+  </div>
+  {{/each}}
 </div>
-{{/each}}
- 
-${name}
+<div>
+  Product Name
+</div>
