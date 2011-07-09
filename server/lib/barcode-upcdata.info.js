@@ -18,7 +18,7 @@ function lookup(barcode, type, callback)
           var object = JSON.parse (data);
           var formatted = {
             name: object.product.product,
-            type: [object.product.category_text, object.product.description]
+            types: [object.product.category_text, object.product.description]
           }
           callback (false, formatted);
         });

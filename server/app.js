@@ -22,6 +22,16 @@ for (plugin in pluginList) {
   }
 }
 
+// Lookup keyword lookups
+
+var keywords = [
+  {
+    type: 'regex',
+    lookup: /^cd$/i,
+    plugins: ['ebay']
+  }
+];
+
 var app = module.exports = express.createServer();
 
 // Configuration
@@ -65,12 +75,70 @@ app.param('barcode', function (req, res, next, id) {
   barcodeLookup.lookup(id, '', function (err, data) {
     if (!err) {
       res.data = data;
-      next();
+      console.log ('We have data', data);
+      getPluginSearchResults(data, function (results) {
+        console.log ('We have search results', results);
+        res.results = results;
+        next ();
+      });
     } else {
       throw Error()
     }
   });
 });
+
+function getPluginSearchResults(barcodeObject, callback) {
+  console.log ('getPluginSearchResults', barcodeObject);
+  getPlugins(barcodeObject.types, function (plugins) {
+    console.log ('We have plugins', plugins);
+    results = [];
+    var count = 0;
+    function runCallback() {
+      count += 1;
+      if (count >= plugins.length)
+        callback(results);
+    }
+
+    plugins.forEach(function (pluginName, inx, arr) {
+      var plugin = pluginsLookup[pluginName].search (barcodeObject.name, function (error, resultArray) {
+        results.push({
+          plugin: pluginName,
+          error: error,
+          results: resultArray
+        });
+        runCallback();
+      });
+    });
+  }); 
+}
+
+function getPlugins(typesArray, callback) {
+  console.log('getPlugins', typesArray);
+  var plugins = {};
+  var count = 0;
+  function runCallback() {
+    count += 1;
+    if (count >= keywords.length) {
+      var pluginsReturn = [];
+      for (plugin in plugins)
+        pluginsReturn.push(plugin);
+      callback(pluginsReturn);
+    }
+  }
+
+  keywords.forEach(function (keyword, inx, arr) {
+    for (type in typesArray) {
+      type = typesArray[type];
+      switch (keyword.type) {
+        case 'regex':
+          if (keyword.lookup.exec(type))
+            for (i in keyword.plugins)
+              plugins[keyword.plugins[i]] = true;
+      }
+    }
+    runCallback(); // Check if we need to run the callback function
+  });
+}
 
 app.listen(3000);
 console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
