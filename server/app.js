@@ -53,6 +53,8 @@ app.configure(function(){
   app.use(express.methodOverride());
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
+  app.use(function (req, res, next) { res.render('404', { status: 404, url: req.url })});
+  app.use(function (err, req, res, next) { res.render('500', { status: err.status || 500, error: err});});
 });
 
 app.configure('development', function(){
@@ -62,6 +64,7 @@ app.configure('development', function(){
 app.configure('production', function(){
   app.use(express.errorHandler()); 
 });
+
 
 // Routes
 
@@ -77,6 +80,21 @@ app.get('/lookup/:barcode', function (req, res) {
     name: res.data.name,
     results: res.results
   });
+});
+
+app.get('/lookup/:barcode/:format', function (req, res) {
+  console.log ('Render with format', res.results, req.params.format);
+  switch (req.params.format) {
+    case 'json':
+      res.write(JSON.stringify(res.results));
+      res.end();
+      break;
+    default:
+      next();
+      res.send('What?', 404);
+      res.write('ERROR');
+      break;
+  }
 });
 
 // Route parameter processors
