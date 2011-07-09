@@ -74,6 +74,11 @@ app.get('/', function(req, res){
   });
 });
 
+app.get('/lookup', function (req, res) {
+  if (req.query.barcode)
+    res.redirect('/lookup/'+req.query.barcode);
+});
+
 app.get('/lookup/:barcode', function (req, res) {
   console.log ('Render with data', res.results);
   res.render('lookup', {
