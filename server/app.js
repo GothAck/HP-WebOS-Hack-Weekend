@@ -10,7 +10,7 @@ var barcodeLookup = require('./lib/barcode-upcdata.info.js');
 
 // Lookup plugin structure
 var pp = './lib/lookup-';
-var pluginList = ['ebay', 'youtube'];
+var pluginList = ['ebay', 'youtube', 'guardian'];
 
 var pluginsLookup = {};
 for (plugin in pluginList) {
@@ -31,7 +31,13 @@ var keywords = [
     //Find CDs
     type: 'regex',
     lookup: /^cd$/i,
-    plugins: ['ebay', 'youtube']
+    plugins: ['ebay', 'youtube', 'guardian']
+  },
+  {
+    //Find CDs 2
+    type: 'string',
+    lookup: 'Electronics / Photography: A/V Media'.toLowerCase(),
+    plugins: ['ebay', 'youtube', 'guardian']
   }
 ];
 
@@ -159,12 +165,20 @@ function getPlugins(typesArray, callback) {
   keywords.forEach(function (keyword, inx, arr) {
     for (type in typesArray) {
       type = typesArray[type];
+      var matched = false;
       switch (keyword.type) {
         case 'regex':
           if (keyword.lookup.exec(type))
-            for (i in keyword.plugins)
-              plugins[keyword.plugins[i]] = true;
+            matched = true;
+          break;
+        case 'string':
+          if (type.toLowerCase().match(keyword.lookup))
+            matched = true;
+          break;
       }
+      if (matched)
+        for (i in keyword.plugins)
+          plugins[keyword.plugins[i]] = true;
     }
     runCallback(); // Check if we need to run the callback function
   });

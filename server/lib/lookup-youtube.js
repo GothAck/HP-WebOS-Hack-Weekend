@@ -8,7 +8,7 @@ function search (term, callback) {
     {
       host: 'gdata.youtube.com',
       port: 80,
-      path: "/feeds/api/videos?q="+querystring.escape(term)+"&alt=json-in-script&callback=showMyVideos2&max-results=1format=5" 
+      path: "/feeds/api/videos?q="+querystring.escape(term)+"&alt=json&max-results=1&format=5" 
     },
     function (response) {
       var data = '';
@@ -17,6 +17,7 @@ function search (term, callback) {
         // process data here
         data = JSON.parse(data);
         var myResultObjects = parse_data(data);
+        console.log (myResultObjects);
         callback(false, myResultObjects) //If there is an error, callback with true as first value and data = error string
       });
     }).on('error', function (error) {
