@@ -1,0 +1,27 @@
+setup notes
+
+
+http://www.nodejs.org/
+download 0.4.9
+extract .gz
+
+./configure
+make
+sudo make install
+
+
+
+http://npmjs.org/
+
+curl http://npmjs.org/install.sh | sudo sh
+
+sudo npm install -g express
+sudo npm install -g jqtpl
+sudo npm install -g nodemon
+
+
+to run
+checkout repository
+
+export NODE_PATH=.:/usr/local/lib/node_modules/
+node app.js
