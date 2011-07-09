@@ -1,4 +1,11 @@
 <h2>
-Test template
+  Search results:
 </h2>
+
+{{each results}}
+<div class="plugin" id="plugin-">
+  {{partial($value) 'layout-plugin'}}
+</div>
+{{/each}}
+ 
 ${name}

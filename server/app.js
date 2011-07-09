@@ -68,6 +68,7 @@ app.get('/lookup/:barcode', function (req, res) {
   console.log (res.data);
   res.render('lookup', {
     name: res.data.name,
+    results: res.results
   });
 });
 
