@@ -4,6 +4,23 @@
  */
 
 var express = require('express');
+var barcodeLookup = require('./lib/barcode-upcdata.info.js');
+
+// Lookup plugin structure
+var pp = './lib/lookup-';
+var pluginList = ['ebay'];
+
+var pluginsLookup = {};
+for (plugin in pluginList) {
+  plugin = pluginList[plugin];
+  console.log('Loading plugin: ' + plugin);
+  try {
+    pluginsLookup[plugin] = require(pp + plugin + '.js');
+  } catch (err) {
+    console.log('Error loading plugin');
+    process.exit(1);
+  }
+}
 
 var app = module.exports = express.createServer();
 
@@ -32,6 +49,26 @@ app.configure('production', function(){
 app.get('/', function(req, res){
   res.render('index', {
     title: 'Express'
+  });
+});
+
+app.get('/lookup/:barcode', function (req, res) {
+  console.log (res.data);
+  res.render('lookup', {
+    name: res.data.name,
+  });
+});
+
+// Route parameter processors
+
+app.param('barcode', function (req, res, next, id) {
+  barcodeLookup.lookup(id, '', function (err, data) {
+    if (!err) {
+      res.data = data;
+      next();
+    } else {
+      throw Error()
+    }
   });
 });
 
