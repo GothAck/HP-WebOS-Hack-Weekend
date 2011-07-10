@@ -41,7 +41,35 @@ function api_call_url(keywords, results) {
     "keywords": keywords,
     "paginationInput.entriesPerPage": results
   }) + "&REST-PAYLOAD";
+  reverse_geocode(0,0);
   return apicall;
+}
+
+function reverse_geocode(lat, lng) {
+  var path = "/maps/api/geocode/json?latlng="+lat+","+lng+"&sensor=false";
+
+  http.get({
+    host: "maps.googleapis.com",
+    port: 80,
+    path: path 
+  }, function (response) {
+    var data = '';
+    response.on('data', function (chunk) { data += chunk })
+    response.on('end', function () {
+      // process data here
+      var results = JSON.parse(data);
+      if (results.status == "OK") {
+        try {
+          var address = results.results[0].formatted_address;
+          address = address.split(",")[1].split(" ");
+          address = address[2]+address[3];
+          console.log("address", address);
+        } catch (err) {
+          console.log("Error:", err);
+        }
+      }
+    });
+  });
 }
 
 exports.search = search;
