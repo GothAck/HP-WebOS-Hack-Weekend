@@ -1,7 +1,7 @@
 {
 	"id": "com.palmdts.enyo.barcodething",
 	"version": "1.0.0",
-	"vendor": "HP",
+	"vendor": "GregAllanGreg",
 	"type": "web",
 	"main": "index.html",
 	"title": "BarcodeThing",
