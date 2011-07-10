@@ -90,8 +90,11 @@ function reverse_geocode(lat, lng, callback) {
           console.log("address", address);
           address = address.split(",");
           address = address[address.length-2].split(" ");
-          address = address[address.length-2]+'+'+address[address.length-1];
-          callback(false, address);
+          postcode = address[address.length-2]+'+'+address[address.length-1];
+          regex = /[a-z0-9]+\w[0-9]+[a-z]+/i;
+          if (!regex.exec(postcode))
+            postcode += 'AA';
+          callback(false, postcode);
         } catch (err) {
           callback(true);
         }
