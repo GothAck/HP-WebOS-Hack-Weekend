@@ -44,7 +44,7 @@
             }
             
             // pixeldata is a line of pixels from an image
-            function read_number_from_pixeldata(pixeldata) {
+            function read_number_from_pixeldata(pixeldata, y_debug) {
                 // pixeldata is in the format linear array as [r,g,b,a,r,g,b,a .. repeat]
                 
                 // Convert to greyscale
@@ -112,7 +112,7 @@
                         else {                                 // Next pixel is not in threshhold
                             if (run_length >= run_max) {        // Record the end of the run
                                 c.fillStyle = "rgb(0,255,128)";
-                                c.fillRect(run_start  ,0,1,100);
+                                c.fillRect(run_start  ,y_debug,1,5);
                                 run_max       = run_length;
                                 run_max_start = run_start;
                                 //console.log('best',run_max_start,' ',run_max);
@@ -126,7 +126,7 @@
                     //console.log('best_before',run_start,' ',run_length);
                     if (run_length >= run_max) {        // had to duplicte this at the end, because the last one should always be checked and recorded if it's the longest
                         c.fillStyle = "rgb(0,255,255)";
-                        c.fillRect(run_start  ,0,1,100);
+                        c.fillRect(run_start  ,y_debug,1,5);
                         
                         run_max       = run_length;
                         run_max_start = run_start;
@@ -142,8 +142,14 @@
                 //console.log(index_start);
                 //console.log(index_end  );
                 c.fillStyle = "rgb(255,255,0)";
-                c.fillRect(index_start,0,1,100);
-                c.fillRect(index_end  ,0,1,100);
+                c.fillRect(index_start  ,y_debug,1,5);
+                c.fillRect(index_end    ,y_debug,1,5);
+                
+                // Abort if no edge
+                if (index_start<=1 && index_end>=c.canvas.width-1 || index_end-index_start < 95) {
+                    //console.log('ABORT')
+                    return '';
+                }
                 
                 // Remove the edges
                 //   by sending seekers out from the center and finding the start pos of the longest run of the same colour
@@ -154,7 +160,7 @@
                 
                 // Get Bit size
                 var bit_size = pixeldata.length / 95;
-                console.log(bit_size);
+                //console.log(bit_size);
                 
                 // Take a descreate bit item location and attempt to recover the binary value at that point using aliasing
                 function get_bit(descreate_index) {
@@ -162,7 +168,7 @@
                     //offset = index - Math.round(index);
                     
                     c.fillStyle = "rgb(255,0,0)";
-                    c.fillRect(index_start+index,0,1,100);
+                    c.fillRect(index_start+index  ,y_debug,1,5);
                     
                     var count = 0;
                     var total = 0;
@@ -301,25 +307,23 @@
                 return return_string;
             }
             
-            /**
-            var line_spacing = 10; // Rather than reading EVERY line (too much processing), take one line every line_spacing
-            
+            var line_spacing = 40; // Rather than reading EVERY line (too much processing), take one line every line_spacing
             
             // Get horizontal lines of the canvas can regular intivals
             // The algoithum will be run on multiple horizontal lines
             // The most commonly occouring number is the one to validate
             var numbers = Array();
-            for (y=0 ; y<=c.canvas.height ; y+=line_spacing) {
+            for (y=40 ; y<=c.canvas.height ; y+=line_spacing) {
                 //numbers.push(read_number_from_pixeldata( pixeldata.slice(y*width*4, y*width+1*4) ));
-                var number = read_number_from_pixeldata( c.getImageData(0, y, c.canvas.width, 1).data );
+                var number = read_number_from_pixeldata( c.getImageData(0, y, c.canvas.width, 1).data, y );
                 numbers.push(number);
                 //console.log(number);
             }
             // find most common
             var number = most_frequent_value(numbers);
-            */
+
             
-            var number = read_number_from_pixeldata( c.getImageData(0, 40, c.canvas.width, 1).data );
+            //var number = read_number_from_pixeldata( c.getImageData(0, 40, c.canvas.width, 1).data );
             
             console.log(number);
             
@@ -342,8 +346,8 @@
                     c.drawImage(i, 0, 0);                    
                     
                 }
-                //i.src = "barcode_test_1.png";
-                i.src = "5099750442227_2.png";
+                i.src = "barcode_test_1.png";
+                //i.src = "5099750442227_2.png";
                 //i.src = "5099750442227.png";
 
             /**
