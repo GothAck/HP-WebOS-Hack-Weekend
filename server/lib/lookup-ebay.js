@@ -3,33 +3,49 @@
 var http = require ('http');
 var querystring = require('querystring');
 
-function search (term, location, callback) {
+function search (term, callback, location) {
   var postcode = null;
   if (typeof location === "object") {
-    postcode = reverse_geocode(location.lat, location.lon);
-  }
-  http.get(
-    {
-      host: 'svcs.ebay.com',
-      port: 80,
-      path: api_call_url(term, 3, postcode)
-    },
-    function (response) {
-      var data = '';
-      response.on('data', function (chunk) { data += chunk })
-      response.on('end', function () {
-        // process data here
-        var myResultObjects = JSON.parse(data);
-        try {
-          myResultObjects = myResultObjects.findItemsByKeywordsResponse[0].searchResult[0].item;
-          callback(false, myResultObjects);
-        } catch (err) {
-          callback(true, ['JSON Error'])
-        }
-      });
-    }).on('error', function (error) {
-      callback(true, ['HTTP Error']);
+    var results = [];
+    reverse_geocode(location.lat, location.lon, function (status, data) {
+      ebay_search(data);
     });
+  } else
+    ebay_search();
+
+  function ebay_search(postcode) {
+    http.get(
+      {
+        host: 'svcs.ebay.com',
+        port: 80,
+        path: api_call_url(term, 3, postcode)
+      },
+      function (response) {
+        var data = '';
+        response.on('data', function (chunk) { data += chunk })
+        response.on('end', function () {
+          // process data here
+          var myResultObjects = JSON.parse(data);
+          try {
+            console.log("LOG:", data);
+            myResultObjects = myResultObjects.findItemsByKeywordsResponse[0].searchResult[0].item;
+            callback(false, myResultObjects);
+          } catch (err) {
+            try {
+              var error_code = myResultObjects.findItemsByKeywordsResponse[0].errorMessage[0].error[0].errorId[0];
+              if (error_code == "18") {
+                return search(term, callback);
+              } else
+                callback(true, ['JSON Error']);
+            } catch (e) {
+              callback(true, ['JSON Error'])
+            }
+          }
+        });
+      }).on('error', function (error) {
+        callback(true, ['HTTP Error']);
+      });
+    }
 }
 
 // Makes keyword search url using given paramater string
@@ -45,13 +61,18 @@ function api_call_url(keywords, results, postcode) {
     "keywords": keywords,
     "paginationInput.entriesPerPage": results
   }) + "&REST-PAYLOAD";
-  if (postcode) { apicall += "&buyerPostalCode="+postcode; }
+  if (typeof postcode !== 'undefined') { apicall += "&buyerPostalCode="+postcode+
+    "&itemFilter(0).name=LocalSearchOnly" +
+    "&itemFilter(0).value=false" +
+    "&itemFilter(1).name=MaxDistance" +
+    "&itemFilter(1).value=50";
+  }
+  console.log("API:", apicall);
   return apicall;
 }
 
-function reverse_geocode(lat, lng) {
+function reverse_geocode(lat, lng, callback) {
   var path = "/maps/api/geocode/json?latlng="+lat+","+lng+"&sensor=false";
-
   http.get({
     host: "maps.googleapis.com",
     port: 80,
@@ -65,14 +86,15 @@ function reverse_geocode(lat, lng) {
       if (results.status == "OK") {
         try {
           var address = results.results[0].formatted_address;
-          address = address.split(",")[1].split(" ");
-          address = address[2]+address[3];
           console.log("address", address);
-          return address;
+          address = address.split(",");
+          address = address[address.length-2].split(" ");
+          address = address[address.length-2]+address[address.length-1];
+          callback(false, address);
         } catch (err) {
-          console.log("Error:", err);
+          callback(true);
         }
-      } else { return null; }
+      } 
     });
   });
 }
