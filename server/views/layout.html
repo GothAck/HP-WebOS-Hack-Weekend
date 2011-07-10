@@ -13,12 +13,6 @@
       </div>
       <div data-role="content">
       <script type="text/javascript">
-        this.controller.serviceRequest('palm://com.palm.location', {
-          method: 'getCurrentPosition',
-          parameters: {},
-          onSuccess : function (e){ Mojo.Log.info("getCurrentPosition success, results="+JSON.stringify(e)); },
-          onFailure : function (e){ Mojo.Log.info("getCurrentPosition failure, results="+JSON.stringify(e)); }
-        }); 
       </script>
           {{html body}}
       </div>
