@@ -1,8 +1,30 @@
 <html>
   <head>
-    <title>Hello World</title>
+    <title>Barcode Thing</title>
+<!--    <link rel="stylesheet" rev="stylesheet" href="/stylesheets/style.css" type="text/css" />-->
+    <link rel="stylesheet" href="/stylesheets/jquery.mobile-1.0b1.min.css" />
+    <script type="text/javascript" src="/javascripts/jquery-1.6.2.min.js"></script>
+    <script type="text/javascript" src="/javascripts/jquery.mobile-1.0b1.min.js"></script>
   </head>
   <body>
-    {{html body}}
+    <div data-role="page">
+      <div data-role="header">
+        <img src="/images/logo.png" alt="Barcode Thing" />
+      </div>
+      <div data-role="content">
+      <script type="text/javascript">
+        this.controller.serviceRequest('palm://com.palm.location', {
+          method: 'getCurrentPosition',
+          parameters: {},
+          onSuccess : function (e){ Mojo.Log.info("getCurrentPosition success, results="+JSON.stringify(e)); },
+          onFailure : function (e){ Mojo.Log.info("getCurrentPosition failure, results="+JSON.stringify(e)); }
+        }); 
+      </script>
+          {{html body}}
+      </div>
+      <div data-role="footer">
+        <img src="/images/footer.png" alt="Barcode Thing" />
+      </div>
+    </div>
   </body>
 </html>

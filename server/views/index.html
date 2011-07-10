@@ -1,1 +1,15 @@
-<h1>Hello World</h1>
+<form method="GET" action="/lookup" data-ajax="false">
+  <div id="scanner-holder" style="text-align: center;">
+    <h1>Welcome to BarcodeThing</h1>
+    <p>We currently don't support capturing images from this device, you can however enter the EAN of the product you wish to search for</p>
+    <ul data-role="listview" data-inset="true" style="margin-left: 20%; margin-right: 20%;"><li style="text-align: center; padding-right: 15px; ">
+      <div data-role="fieldcontain">
+        <label for="barcode">Barcode:</label>
+        <input type="text" name="barcode">
+      </div>
+      <div data-role="fieldcontain">
+        <input type="submit" value="Search" />
+      </div>
+    </li></ul>
+  </div>
+</form>
