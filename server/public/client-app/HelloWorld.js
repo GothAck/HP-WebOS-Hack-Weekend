@@ -7,6 +7,18 @@ enyo.kind({
       onSuccess: "gotResults",
       onFailure: "gotResultsFailure",
     },
+    
+    {
+      name : "getCurPosition",
+      kind : "PalmService",
+      service : "palm://com.palm.location/",
+      method : "getCurrentPosition",
+      onSuccess : "posFinished",
+      onFailure : "posFail",
+      onResponse : "gotResponse",
+      subscribe : false,
+    },
+
     {kind: "PageHeader", content: "BarcodeThing"},
     {kind: "RowGroup", caption: "Search for a barcode number", components: [
       {kind: "Input", components: [
@@ -32,9 +44,7 @@ enyo.kind({
     ]},
   ],
   btnClick: function () {
-    var url = "http://tnkd.net:3000/lookup/"+this.$.input.getValue()+'/json';
-    this.$.getResults.setUrl(url);
-    this.$.getResults.call();
+    this.$.getCurPosition.call({});
   },
   gotResults: function (inSender, inResponse) {
     this.results = inResponse;
@@ -69,37 +79,28 @@ enyo.kind({
   create: function () {
     this.inherited(arguments);
     this.results = [];
-  }
-});
-/*
-enyo.kind({
-  name: "enyo.Canon.ListItem",
-  kind: enyo.VFlexLayout,
-  components: [ { content: "Content" } ],
-  content: "Content",
+  },
+
+  posFinished : function(inSender, inResponse) {
+    //enalert ("getCurrentPosition success, results=" + enyo.json.stringify(inResponse));
+    enyo.log("getCurrentPosition success, results=" + enyo.json.stringify(inResponse));
+    var url = "http://tnkd.net:3000/lookup/"+this.$.input.getValue()+'/json?lat='+inResponse.latitude+'&lon='+inResponse.longitude;
+    this.$.getResults.setUrl(url);
+    this.$.getResults.call();
+  },
+  posFail : function(inSender, inResponse) {
+    enyo.log("getCurrentPosition success, results=" + enyo.json.stringify(inResponse));
+    var url = "http://tnkd.net:3000/lookup/"+this.$.input.getValue()+'/json';
+    this.$.getResults.setUrl(url);
+    this.$.getResults.call();
+  },
+  getPos : function(inSender, inResponse)
+  {
+    this.$.getCurPosition.call({});
+  },
+
 });
 
-enyo.kind({
-  name: "enyo.Canon.WebService",
-  kind: enyo.WebService,
-  url: "http://localhost/lookup",
-  onSuccess: "gotSearch",
-  onFailure: "gotSearchFailure",
-  gotSearch: function (inSender, inResponse, inRequest) {
-    this.searchResults = inResponse;
-  },
-  gotSearchFailure: function (inSender, inResponse, inRequest) {
-    enyo.log("fail response");
-  },
-});
-
-enyo.kind({
-  name: "enyo.Canon.ThingList",
-  kind: enyo.SlidingView,
-  layoutKind: enyo.VFlexLayout,
-  components: [],
-});
-*/
 customRender = {
   'youtube': function(data) {
       return '<a href="' + data.playerurl + '">' + data.title + '</a>';
