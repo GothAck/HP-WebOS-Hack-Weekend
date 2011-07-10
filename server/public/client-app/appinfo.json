@@ -1,10 +1,10 @@
 {
-	"id": "com.palmdts.enyo.helloworld",
+	"id": "com.palmdts.enyo.barcodething",
 	"version": "1.0.0",
 	"vendor": "HP",
 	"type": "web",
 	"main": "index.html",
-	"title": "Enyo HelloWorld",
+	"title": "BarcodeThing",
 	"icon": "icon.png",
 	"uiRevision": 2
 }

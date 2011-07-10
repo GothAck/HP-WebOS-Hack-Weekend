@@ -1,6 +1,14 @@
+<script src="/javascripts/barcode.js" type="text/javascript"></script>
+<script type="text/javascript">
+  $(function () {
+    draw();
+  }
+</script>
 <form method="GET" action="/lookup" data-ajax="false">
   <div id="scanner-holder" style="text-align: center;">
     <h1>Welcome to BarcodeThing</h1>
+      <canvas id="canvas" width="500" height="300" onclick="read();"></canvas>
+
     <p>We currently don't support capturing images from this device, you can however enter the EAN of the product you wish to search for</p>
     <ul data-role="listview" data-inset="true" style="margin-left: 20%; margin-right: 20%;"><li style="text-align: center; padding-right: 15px; ">
       <div data-role="fieldcontain">
