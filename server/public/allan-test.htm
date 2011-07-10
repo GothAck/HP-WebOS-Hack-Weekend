@@ -307,7 +307,7 @@
                 return return_string;
             }
             
-            var line_spacing = 40; // Rather than reading EVERY line (too much processing), take one line every line_spacing
+            var line_spacing = 10; // Rather than reading EVERY line (too much processing), take one line every line_spacing
             
             // Get horizontal lines of the canvas can regular intivals
             // The algoithum will be run on multiple horizontal lines
@@ -316,10 +316,12 @@
             for (y=40 ; y<=c.canvas.height ; y+=line_spacing) {
                 //numbers.push(read_number_from_pixeldata( pixeldata.slice(y*width*4, y*width+1*4) ));
                 var number = read_number_from_pixeldata( c.getImageData(0, y, c.canvas.width, 1).data, y );
-                numbers.push(number);
+                if ( number.indexOf('-') === -1 && number !== '' )
+                    numbers.push(number);
                 //console.log(number);
             }
             // find most common
+            console.log (numbers);
             var number = most_frequent_value(numbers);
 
             
@@ -346,8 +348,8 @@
                     c.drawImage(i, 0, 0);                    
                     
                 }
-                i.src = "barcode_test_1.png";
-                //i.src = "5099750442227_2.png";
+                //i.src = "barcode_test_1.png";
+                i.src = "5099750442227_5.png";
                 //i.src = "5099750442227.png";
 
             /**
