@@ -3,7 +3,7 @@
 var http = require ('http');
 var querystring = require('querystring');
 
-function search (term, callback) {
+function search (term, location, callback) {
   http.get(
     {
       host: 'content.guardianapis.com',

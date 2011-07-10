@@ -3,12 +3,16 @@
 var http = require ('http');
 var querystring = require('querystring');
 
-function search (term, callback) {
+function search (term, location, callback) {
+  var postcode = null;
+  if (typeof location === "object") {
+    postcode = reverse_geocode(location.lat, location.lon);
+  }
   http.get(
     {
       host: 'svcs.ebay.com',
       port: 80,
-      path: api_call_url(term, 3)
+      path: api_call_url(term, 3, postcode)
     },
     function (response) {
       var data = '';
@@ -29,7 +33,7 @@ function search (term, callback) {
 }
 
 // Makes keyword search url using given paramater string
-function api_call_url(keywords, results) {
+function api_call_url(keywords, results, postcode) {
   var base_url = "/services/search/FindingService/v1?";
   var appid = "GMackeld-40b4-41b0-8799-c897cec58896"; 
   var apicall = base_url + querystring.stringify({
@@ -41,7 +45,7 @@ function api_call_url(keywords, results) {
     "keywords": keywords,
     "paginationInput.entriesPerPage": results
   }) + "&REST-PAYLOAD";
-  reverse_geocode(0,0);
+  if (postcode) { apicall += "&buyerPostalCode="+postcode; }
   return apicall;
 }
 
@@ -64,10 +68,11 @@ function reverse_geocode(lat, lng) {
           address = address.split(",")[1].split(" ");
           address = address[2]+address[3];
           console.log("address", address);
+          return address;
         } catch (err) {
           console.log("Error:", err);
         }
-      }
+      } else { return null; }
     });
   });
 }
