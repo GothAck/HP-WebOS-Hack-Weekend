@@ -1,6 +1,6 @@
 
 //------------------------------------------------------------------------------
-        function read_barcode(canvas) {
+        function read_barcode(canvas, callback) {
             var c = canvas;
             
             // Find and return the most frequently occouring value in an array
@@ -227,10 +227,14 @@
                     return {type:'',val:''}
                 }
                 
+                var digits = '';
                 //console.log(get_didget(7));
                 for (var i=0 ; i<12 ; i++) {
-                    console.log(lookup_didget(get_didget(i)));
+                    digit = lookup_didget(get_didget(i))
+                    digits += digit.val;
+                    console.log(digit);
                 }
+		        callback(digits);
                 
                 return 0;
             }
@@ -268,15 +272,16 @@
             var canvas = document.getElementById("canvas");
             if (canvas.getContext) {
                 var c = canvas.getContext("2d");
-
     
                 
                 var i = new Image();
                 i.onload = function() {
-                    c.drawImage(i, 0, 0);                    
+                    c.drawImage(i, 0, 0);
+                    console.log ('drawn');                  
                     
                 }
-                i.src = "barcode_test_1.png";
+                i.src = "/barcode_test_1.png";
+                //i.src = "/5099750442227_2.png";
 
             /**
                                                  
@@ -297,11 +302,11 @@
             }
         }
         
-        function read() {
+        function read(callback) {
             var canvas = document.getElementById("canvas");
             if (canvas.getContext) {
                 var c = canvas.getContext("2d");
-                read_barcode(c);
+                read_barcode(c, callback);
 
                 /*
                 c.fillStyle = "rgb(40,0,0)";
