@@ -37,7 +37,7 @@ enyo.kind({
               components: [
                 {kind: "Item", layoutKind: "VFlexLayout", components: [
                   {name: "itemTitle"},
-                  {name: "description", kind: "HtmlContent", onLinkClick: "doLinkClick"}
+                  {name: "description", allowHtml: true}
                 ]},
               ],
             },
@@ -48,6 +48,10 @@ enyo.kind({
   ],
   btnClick: function () {
     this.$.getCurPosition.call({});
+  },
+  doLinkClick: function (inSender, inUrl) {
+    enyo.log("Got URL Click" + inUrl);
+    //this.controller.serviceRequest(inUrl, method: 'launch');
   },
   gotResults: function (inSender, inResponse) {
     this.results = inResponse;
@@ -106,12 +110,16 @@ enyo.kind({
 
 customRender = {
   'youtube': function(data) {
-      return '<a href="' + data.playerurl + '">' + data.title + '</a>';
+      var ret = '<img style="float:left; height: 80px; padding-right: 4px" src="' + data.thumburl + '" />';
+      ret += '<a href="' + data.playerurl + '">' + data.title + '</a><div style="clear:both"></div>';
+      return ret;
     },
   'ebay': function(data) {
-      return '<a href="' + data.viewItemURL + '">' + data.location + '<br /> &pound;' + data.sellingStatus[0].currentPrice[0].__value__ + ' + &pound;' + data.shippingInfo[0].shippingServiceCost[0].__value__ + ' P&P </a>';
+      var ret = '<img style="float:left; height: 80px; padding-right: 4px" src="' + data.galleryURL[0] + '" />';
+      ret += '<a href="' + data.viewItemURL + '">' + data.location + '<br /> &pound;' + data.sellingStatus[0].currentPrice[0].__value__ + ' + &pound;' + data.shippingInfo[0].shippingServiceCost[0].__value__ + ' P&P </a>';
+      return ret;
     },
   'guardian': function(data) {
-      return '<a href="' + data.url + '">' + data.text + '</a>';
+      return '<a href="' + data.url + '">' + data.text + '</a><div style="clear:both"></div>';
     },
   }
