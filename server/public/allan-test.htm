@@ -350,13 +350,13 @@
 </head>
 <body onLoad="initCanvas(320,240); draw();">
     
-    <object  id="iembedflash" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,0,0" width="320" height="240">
-  		<param name="movie" value="camcanvas.swf" />
-
-  		<param name="quality" value="high" />
-		<param name="allowScriptAccess" value="always" />
-  		<embed  allowScriptAccess="always"  id="embedflash" src="camcanvas.swf" quality="high" width="320" height="240" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" mayscript="true"  />
+	<object width="320" height="240" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,0,0" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" id="iembedflash">
+  		<param value="camcanvas.swf" name="movie">
+  		<param value="high" name="quality">
+		<param value="always" name="allowScriptAccess">
+  		<embed width="320" height="240" mayscript="true" pluginspage="http://www.macromedia.com/go/getflashplayer" type="application/x-shockwave-flash" quality="high" src="camcanvas.swf" id="embedflash" allowscriptaccess="always">
 	</object>
+<input type="button" onclick="captureToCanvas()" value="Capture"/>
     
     <div class="webcam-target" style="margin-top:1em;-moz-border-radius:12px; background-color:#ddd;width:360px;text-align:center;height:260px;padding-top:15px;;">
         <canvas  id="canvas" width="320" height="240"></canvas>
