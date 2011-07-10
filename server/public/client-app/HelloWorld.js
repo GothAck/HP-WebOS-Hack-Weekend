@@ -32,7 +32,7 @@ enyo.kind({
     ]},
   ],
   btnClick: function () {
-    var url = "http://localhost:3000/lookup/"+this.$.input.getValue()+'/json';
+    var url = "http://tnkd.net:3000/lookup/"+this.$.input.getValue()+'/json';
     this.$.getResults.setUrl(url);
     this.$.getResults.call();
   },
