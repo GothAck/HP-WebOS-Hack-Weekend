@@ -3,26 +3,42 @@
   function fillBarcode(digits) {
     $('#barcode_digits').val(digits)
   }
+
+    function clearCanvas(context, canvas) {
+        console.log("clearRect", 0,0,canvas.width, canvas.height);
+        context.clearRect(0,0,canvas.width, canvas.height);
+        var w = canvas.width;
+        canvas.width = 1;
+        canvas.width = w;
+    }
   
-    function draw() {
+    function draw(callback) {
+        var src = $('select#barcodes').val();
         var canvas = document.getElementById("canvas");
         if (canvas.getContext) {
             var c = canvas.getContext("2d");
             
+            clearCanvas(c, canvas);
+
             var i = new Image();
             i.onload = function() {
                 c.drawImage(i, 0, 0);
+                if (typeof callback === 'function') callback();
             }
-            i.src = "/barcode_test_1.png";
+            i.src = src;
             //i.src = "/5099750442227_2.png";                
         }
     }
     
     function read(callback) {
+        function cb () {
+          read_barcode(c, callback);
+        }
         var canvas = document.getElementById("canvas");
         if (canvas.getContext) {
             var c = canvas.getContext("2d");
-            read_barcode(c, callback);
+            draw (cb);
+            
         }
     }
 
@@ -31,6 +47,17 @@
   <div id="scanner-holder" style="text-align: center;">
     <h1>Welcome to BarcodeThing</h1>
       <canvas id="canvas" width="500" height="300" onclick="read(fillBarcode);"></canvas>
+    <p>
+      <select id="barcodes" onchange="draw('/'+$(this).val());">
+        <option value="5099750442227.png">EAN Too Small</option>
+        <option value="5099750442227_1.png">EAN Still Too Small</option>
+        <option value="5099750442227_2.png">EAN Big Enough</option>
+        <option value="5099750442227_3.png">EAN 4 Deg. Skew</option>
+        <option value="5099750442227_4.png">EAN 8 Deg. Skew</option>
+        <option value="5099750442227_5.png">EAN 12 Deg. Skew</option>
+        <option value="barcode_test_1.png">UAN</option>
+      </script>
+    </p>
     <p>We currently don't support capturing images from this device, you can however enter the EAN of the product you wish to search for</p>
     <ul data-role="listview" data-inset="true" style="margin-left: 20%; margin-right: 20%;"><li style="text-align: center; padding-right: 15px; ">
       <div data-role="fieldcontain">
