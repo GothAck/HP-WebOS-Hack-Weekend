@@ -81,10 +81,14 @@ app.get('/lookup', function (req, res) {
 
 app.get('/lookup/:barcode', function (req, res) {
   console.log ('Render with data', res.results);
-  res.render('lookup', {
-    name: res.data.name,
-    results: res.results
-  });
+  if (res.results.length > 0) {
+    res.render('lookup', {
+      name: res.data.name,
+      results: res.results
+    });
+  } else {
+    res.render('404', { status: 404, url: req.url })
+  }
 });
 
 app.get('/lookup/:barcode/:format', function (req, res) {
@@ -150,6 +154,7 @@ function getPluginSearchResults(barcodeObject, callback) {
   console.log ('getPluginSearchResults', barcodeObject);
   getPlugins(barcodeObject.types, function (plugins) {
     console.log ('We have plugins', plugins);
+    if (plugins.length == 0) callback([]);
     results = [];
     var count = 0;
     function runCallback() {
