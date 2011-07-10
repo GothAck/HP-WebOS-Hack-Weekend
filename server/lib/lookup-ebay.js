@@ -66,9 +66,8 @@ function api_call_url(keywords, results, postcode) {
     "&itemFilter(0).name=LocalSearchOnly" +
     "&itemFilter(0).value=false" +
     "&itemFilter(1).name=MaxDistance" +
-    "&itemFilter(1).value=50";
+    "&itemFilter(1).value=100";
   }
-  console.log("API:", apicall);
   return apicall;
 }
 

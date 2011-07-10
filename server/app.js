@@ -53,8 +53,8 @@ app.configure(function(){
   app.use(express.methodOverride());
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
-  app.use(function (req, res, next) { res.render('404', { status: 404, url: req.url })});
-  app.use(function (err, req, res, next) { res.render('500', { status: err.status || 500, error: err});});
+//  app.use(function (req, res, next) { res.render('404', { status: 404, url: req.url })});
+//  app.use(function (err, req, res, next) { res.render('500', { status: err.status || 500, error: err});});
 });
 
 app.configure('development', function(){
@@ -109,7 +109,7 @@ app.get('/lookup/:barcode/:format', function (req, res) {
 app.param('barcode', function (req, res, next, id) {
 
   function search(data, location) {
-    getPluginSearchResults(data, location, function (results) {
+    getPluginSearchResults(data, location, id, function (results) {
       console.log ('We have search results', results);
       res.results = results;
       next ();
@@ -132,7 +132,7 @@ app.param('barcode', function (req, res, next, id) {
         data = JSON.parse(data);
         res.data = data;
         console.log ('We have cached data', data);
-        search(data, loc_obj);
+        search(data, loc_obj, id);
       });
     } else {
       barcodeLookup.lookup(id, '', function (err, data) {
@@ -142,7 +142,7 @@ app.param('barcode', function (req, res, next, id) {
           var cache_data = JSON.stringify(data);
           console.log ('Caching data', cache_data);
           redis.set(redis_key, cache_data);
-          getPluginSearchResults(data, loc_obj, function (results) {
+          getPluginSearchResults(data, loc_obj, id, function (results) {
             console.log ('We have search results', results);
             res.results = results;
             next ();
@@ -156,7 +156,7 @@ app.param('barcode', function (req, res, next, id) {
 
 });
 
-function getPluginSearchResults(barcodeObject, location, callback) {
+function getPluginSearchResults(barcodeObject, location, barcode, callback) {
   console.log ('getPluginSearchResults', barcodeObject);
   getPlugins(barcodeObject.types, function (plugins) {
     console.log ('We have plugins', plugins);
@@ -177,7 +177,7 @@ function getPluginSearchResults(barcodeObject, location, callback) {
           results: resultArray
         });
         runCallback();
-      }, location);
+      }, location, barcode);
     });
   }); 
 }
