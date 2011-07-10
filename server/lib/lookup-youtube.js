@@ -3,7 +3,7 @@
 var http = require ('http');
 var querystring = require('querystring');
 
-function search (term, callback) {
+function search (term, callback, location) {
   http.get(
     {
       host: 'gdata.youtube.com',
@@ -17,7 +17,7 @@ function search (term, callback) {
         // process data here
         data = JSON.parse(data);
         var myResultObjects = parse_data(data);
-        callback(false, myResultObjects) //If there is an error, callback with true as first value and data = error string
+        callback(false, myResultObjects); //If there is an error, callback with true as first value and data = error string
       });
     }).on('error', function (error) {
       callback(true, 'HTTP Error');
