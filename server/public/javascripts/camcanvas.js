@@ -25,12 +25,12 @@
 		gCtx = gCanvas.getContext("2d");
 		gCtx.clearRect(0, 0, w, h);
 		imageData = gCtx.getImageData( 0,0,320,240);
-		console.log('!');
+		//console.log('!');
 	}
 
 	passLine = function (stringPixels) { 
 		//a = (intVal >> 24) & 0xff;
-		console.log(stringPixels);
+		//console.log(stringPixels);
 		var coll = stringPixels.split("-");
 	
 		for(var i=0;i<320;i++) { 

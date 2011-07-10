@@ -2,6 +2,8 @@
 <head>
     <title>Canvas tutorial</title>
     
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+    
     <script type="text/javascript" src="javascripts/camcanvas.js"></script>
     
     <script type="application/x-javascript">
@@ -346,22 +348,35 @@
     
     <style type="text/css">
     barcode_canvas { border: 1px dashed red; }
+    .hidden {
+        /* display: none; */
+        display: inline-block;
+        width: 1px;
+        height: 1px;
+    }
     </style>
 </head>
 <body onLoad="initCanvas(320,240); draw();">
-    
+
 	<object width="320" height="240" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,0,0" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" id="iembedflash">
   		<param value="camcanvas.swf" name="movie">
   		<param value="high" name="quality">
 		<param value="always" name="allowScriptAccess">
   		<embed width="320" height="240" mayscript="true" pluginspage="http://www.macromedia.com/go/getflashplayer" type="application/x-shockwave-flash" quality="high" src="camcanvas.swf" id="embedflash" allowscriptaccess="always">
 	</object>
-<input type="button" onclick="captureToCanvas()" value="Capture"/>
+<input type="button" onclick="capture_timer(); $('#iembedflash').addClass('hidden'); $('webcam-target').removeClass('hidden');" value="Capture"/>
     
-    <div class="webcam-target" style="margin-top:1em;-moz-border-radius:12px; background-color:#ddd;width:360px;text-align:center;height:260px;padding-top:15px;;">
+    <div class="webcam-target hidden" style="margin-top:1em;-moz-border-radius:12px; background-color:#ddd;width:360px;text-align:center;height:260px;padding-top:15px;;">
         <canvas  id="canvas" width="320" height="240"></canvas>
     </div>
+
+    <script type="text/javascript">
+    function capture_timer() {
+        setTimeout('captureToCanvas(); capture_timer();',500);
+    }
     
+    </script>
+
     <canvas id="barcode_canvas" width="500" height="300" onclick="read();"></canvas>
 </body>
 </html>
