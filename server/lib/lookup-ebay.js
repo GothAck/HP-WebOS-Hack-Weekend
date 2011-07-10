@@ -90,7 +90,7 @@ function reverse_geocode(lat, lng, callback) {
           console.log("address", address);
           address = address.split(",");
           address = address[address.length-2].split(" ");
-          address = address[address.length-2]+address[address.length-1];
+          address = address[address.length-2]+'+'+address[address.length-1];
           callback(false, address);
         } catch (err) {
           callback(true);
