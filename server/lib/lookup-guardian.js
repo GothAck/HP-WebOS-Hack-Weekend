@@ -19,6 +19,10 @@ function search (term, callback) {
         // process data here
         data =JSON.parse(data);
         var myResultObjects = parse_data(data);
+        if (!myResultObjects) {
+          callback(true, ['No Data']);
+          return;
+        }
         try {
           callback(false, myResultObjects);
         } catch (err) {
@@ -47,18 +51,19 @@ function api_call_url(keywords) {
 }
 
 function parse_data(data) {
-  var results = [];
-  var items = data.response.results;
-  for (var i = 0; i < 3 || i < results.length; i++) {
-    var item = items[i].fields;
-    results[i] = ({
-      title:  item.headline,
-      text: item.trailText,
-      url:  item.shortUrl,
-      thumburl: item.thumbnail || ''
-    });
-  }
-  return results;
+    var results = [];
+    var items = data.response.results;
+    for (var i = 0; i < 3 || i < results.length; i++) {
+      if (typeof items[i] === 'undefined') continue;
+      var item = items[i].fields;
+      results[i] = ({
+        title:  item.headline,
+        text: item.trailText,
+        url:  item.shortUrl,
+        thumburl: item.thumbnail || ''
+      });
+    }
+    return results;
 }
 
 exports.search = search;
