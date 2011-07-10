@@ -2,6 +2,8 @@
 <head>
     <title>Canvas tutorial</title>
     
+    <script type="text/javascript" src="javascripts/camcanvas.js"></script>
+    
     <script type="application/x-javascript">
 
 //------------------------------------------------------------------------------
@@ -270,7 +272,7 @@
 
     
         function draw() {
-            var canvas = document.getElementById("canvas");
+            var canvas = document.getElementById("barcode_canvas");
             if (canvas.getContext) {
                 var c = canvas.getContext("2d");
 
@@ -303,7 +305,7 @@
         }
         
         function read() {
-            var canvas = document.getElementById("canvas");
+            var canvas = document.getElementById("barcode_canvas");
             if (canvas.getContext) {
                 var c = canvas.getContext("2d");
                 read_barcode(c);
@@ -343,10 +345,23 @@
     </script>
     
     <style type="text/css">
-    canvas { border: 1px dashed red; }
+    barcode_canvas { border: 1px dashed red; }
     </style>
 </head>
-<body onLoad="draw();">
-    <canvas id="canvas" width="500" height="300" onclick="read();"></canvas>
+<body onLoad="initCanvas(320,240); draw();">
+    
+    <object  id="iembedflash" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,0,0" width="320" height="240">
+  		<param name="movie" value="camcanvas.swf" />
+
+  		<param name="quality" value="high" />
+		<param name="allowScriptAccess" value="always" />
+  		<embed  allowScriptAccess="always"  id="embedflash" src="camcanvas.swf" quality="high" width="320" height="240" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" mayscript="true"  />
+	</object>
+    
+    <div class="webcam-target" style="margin-top:1em;-moz-border-radius:12px; background-color:#ddd;width:360px;text-align:center;height:260px;padding-top:15px;;">
+        <canvas  id="canvas" width="320" height="240"></canvas>
+    </div>
+    
+    <canvas id="barcode_canvas" width="500" height="300" onclick="read();"></canvas>
 </body>
 </html>
