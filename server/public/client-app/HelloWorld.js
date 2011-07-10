@@ -16,7 +16,7 @@ enyo.kind({
       onSuccess : "posFinished",
       onFailure : "posFail",
       onResponse : "gotResponse",
-      subscribe : true
+      subscribe : false,
     },
 
     {kind: "PageHeader", content: "BarcodeThing"},
@@ -44,9 +44,7 @@ enyo.kind({
     ]},
   ],
   btnClick: function () {
-    var url = "http://tnkd.net:3000/lookup/"+this.$.input.getValue()+'/json';
-    this.$.getResults.setUrl(url);
-    this.$.getResults.call();
+    this.$.getCurPosition.call({});
   },
   gotResults: function (inSender, inResponse) {
     this.results = inResponse;
@@ -84,10 +82,17 @@ enyo.kind({
   },
 
   posFinished : function(inSender, inResponse) {
+    //enalert ("getCurrentPosition success, results=" + enyo.json.stringify(inResponse));
     enyo.log("getCurrentPosition success, results=" + enyo.json.stringify(inResponse));
+    var url = "http://tnkd.net:3000/lookup/"+this.$.input.getValue()+'/json?lat='+inResponse.latitude+'&lon='+inResponse.longitude;
+    this.$.getResults.setUrl(url);
+    this.$.getResults.call();
   },
   posFail : function(inSender, inResponse) {
     enyo.log("getCurrentPosition success, results=" + enyo.json.stringify(inResponse));
+    var url = "http://tnkd.net:3000/lookup/"+this.$.input.getValue()+'/json';
+    this.$.getResults.setUrl(url);
+    this.$.getResults.call();
   },
   getPos : function(inSender, inResponse)
   {
@@ -95,35 +100,7 @@ enyo.kind({
   },
 
 });
-/*
-enyo.kind({
-  name: "enyo.Canon.ListItem",
-  kind: enyo.VFlexLayout,
-  components: [ { content: "Content" } ],
-  content: "Content",
-});
 
-enyo.kind({
-  name: "enyo.Canon.WebService",
-  kind: enyo.WebService,
-  url: "http://localhost/lookup",
-  onSuccess: "gotSearch",
-  onFailure: "gotSearchFailure",
-  gotSearch: function (inSender, inResponse, inRequest) {
-    this.searchResults = inResponse;
-  },
-  gotSearchFailure: function (inSender, inResponse, inRequest) {
-    enyo.log("fail response");
-  },
-});
-
-enyo.kind({
-  name: "enyo.Canon.ThingList",
-  kind: enyo.SlidingView,
-  layoutKind: enyo.VFlexLayout,
-  components: [],
-});
-*/
 customRender = {
   'youtube': function(data) {
       return '<a href="' + data.playerurl + '">' + data.title + '</a>';

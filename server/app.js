@@ -100,8 +100,6 @@ app.get('/lookup/:barcode/:format', function (req, res) {
       break;
     default:
       next();
-      res.send('What?', 404);
-      res.write('ERROR');
       break;
   }
 });
@@ -110,8 +108,8 @@ app.get('/lookup/:barcode/:format', function (req, res) {
 
 app.param('barcode', function (req, res, next, id) {
 
-  function search(data) {
-    getPluginSearchResults(data, function (results) {
+  function search(data, location) {
+    getPluginSearchResults(data, location, function (results) {
       console.log ('We have search results', results);
       res.results = results;
       next ();
@@ -120,13 +118,21 @@ app.param('barcode', function (req, res, next, id) {
 
   var redis_key = redis_prefix + id;
   console.log ('Redis key', redis_key);
+  var loc_obj = undefined;
+  if (req.query.lat && req.query.lon) {
+    loc_obj = {
+      lat: req.query.lat,
+      lon: req.query.lon
+    }
+    console.log("We have a location", loc_obj);
+  }
   redis.exists(redis_key, function (err, exists) {
     if (exists == 1) {
       redis.get(redis_key, function (err, data) {
         data = JSON.parse(data);
         res.data = data;
         console.log ('We have cached data', data);
-        search(data);
+        search(data, loc_obj);
       });
     } else {
       barcodeLookup.lookup(id, '', function (err, data) {
@@ -136,7 +142,7 @@ app.param('barcode', function (req, res, next, id) {
           var cache_data = JSON.stringify(data);
           console.log ('Caching data', cache_data);
           redis.set(redis_key, cache_data);
-          getPluginSearchResults(data, function (results) {
+          getPluginSearchResults(data, loc_obj, function (results) {
             console.log ('We have search results', results);
             res.results = results;
             next ();
@@ -150,7 +156,7 @@ app.param('barcode', function (req, res, next, id) {
 
 });
 
-function getPluginSearchResults(barcodeObject, callback) {
+function getPluginSearchResults(barcodeObject, location, callback) {
   console.log ('getPluginSearchResults', barcodeObject);
   getPlugins(barcodeObject.types, function (plugins) {
     console.log ('We have plugins', plugins);
@@ -171,7 +177,7 @@ function getPluginSearchResults(barcodeObject, callback) {
           results: resultArray
         });
         runCallback();
-      });
+      }, location);
     });
   }); 
 }
