@@ -27,12 +27,13 @@ function search (term, callback, location) {
           // process data here
           var myResultObjects = JSON.parse(data);
           try {
-            console.log("LOG:", data);
+            console.log ('Trying result');
             myResultObjects = myResultObjects.findItemsByKeywordsResponse[0].searchResult[0].item;
             callback(false, myResultObjects);
           } catch (err) {
             try {
               var error_code = myResultObjects.findItemsByKeywordsResponse[0].errorMessage[0].error[0].errorId[0];
+              console.log ('Location ERROR caught, trying global');
               if (error_code == "18") {
                 return search(term, callback);
               } else
