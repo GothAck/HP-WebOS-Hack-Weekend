@@ -119,6 +119,7 @@ app.param('barcode', function (req, res, next, id) {
   var redis_key = redis_prefix + id;
   console.log ('Redis key', redis_key);
   var loc_obj = undefined;
+  console.log("Location", req.params);
   if (req.params.lat && req.params.lon) {
     loc_obj = {
       lat: req.params.lat,
