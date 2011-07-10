@@ -7,6 +7,18 @@ enyo.kind({
       onSuccess: "gotResults",
       onFailure: "gotResultsFailure",
     },
+    
+    {
+      name : "getCurPosition",
+      kind : "PalmService",
+      service : "palm://com.palm.location/",
+      method : "getCurrentPosition",
+      onSuccess : "posFinished",
+      onFailure : "posFail",
+      onResponse : "gotResponse",
+      subscribe : true
+    },
+
     {kind: "PageHeader", content: "BarcodeThing"},
     {kind: "RowGroup", caption: "Search for a barcode number", components: [
       {kind: "Input", components: [
@@ -69,7 +81,19 @@ enyo.kind({
   create: function () {
     this.inherited(arguments);
     this.results = [];
-  }
+  },
+
+  posFinished : function(inSender, inResponse) {
+    enyo.log("getCurrentPosition success, results=" + enyo.json.stringify(inResponse));
+  },
+  posFail : function(inSender, inResponse) {
+    enyo.log("getCurrentPosition success, results=" + enyo.json.stringify(inResponse));
+  },
+  getPos : function(inSender, inResponse)
+  {
+    this.$.getCurPosition.call({});
+  },
+
 });
 /*
 enyo.kind({
