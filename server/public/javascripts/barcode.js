@@ -1,6 +1,6 @@
 
 //------------------------------------------------------------------------------
-        function read_barcode(canvas, callback) {
+        function read_barcode(canvas) {
             var c = canvas;
             
             // Find and return the most frequently occouring value in an array
@@ -35,7 +35,7 @@
             }
             
             // pixeldata is a line of pixels from an image
-            function read_number_from_pixeldata(pixeldata) {
+            function read_number_from_pixeldata(pixeldata, y_debug) {
                 // pixeldata is in the format linear array as [r,g,b,a,r,g,b,a .. repeat]
                 
                 // Convert to greyscale
@@ -43,8 +43,15 @@
                 // greyscale pixel data by averaging r,g,b and ignoring alpha
                 var pixeldata_grey = [pixeldata.length/4]
                 for (i=0 ; i < pixeldata.length ; i+=4) {
-                    // grey             = (          r              g                b   ) / 3
-                    pixeldata_grey[i/4] = (pixeldata[i] + pixeldata[i+1] + pixeldata[i+2]) / 3;
+                    // deal with black out of picture pixels and make them white
+                    //console.log('r',pixeldata[i],'g',pixeldata[i+1],'b',pixeldata[i+2],'a',pixeldata[i+3]);
+                    if (pixeldata[i+0]==0 && pixeldata[i+1]==0 && pixeldata[i+2]==0 && pixeldata[i+3]==0) {
+                        pixeldata_grey[i/4]=255;
+                    }
+                    else {
+                        // grey             = (          r              g                b   ) / 3
+                        pixeldata_grey[i/4] = (pixeldata[i] + pixeldata[i+1] + pixeldata[i+2]) / 3;
+                    }
                 }
                 
                 // Normalize pixel data - based on the min and max - convert into floats between 0.0 and 1.0
@@ -87,25 +94,36 @@
                     for (var i = run_start ; direction_function(i) ; i+=direction) {
                         // If pixel is within threashhold
                         var diff = Math.abs(pixeldata[i]-run_value);
+                        //console.log('diff',diff,'i',i,'val',run_value)
                         if (diff < edge_threshhold) {
                             run_length += 1;                   //   increment the run length
+                            
                         }
                         // Else next pixel is outside of threshold
                         else {                                 // Next pixel is not in threshhold
-                            if (run_length > run_max) {        // Record the end of the run
+                            if (run_length >= run_max) {        // Record the end of the run
+                                c.fillStyle = "rgb(0,255,128)";
+                                c.fillRect(run_start  ,y_debug,1,5);
                                 run_max       = run_length;
                                 run_max_start = run_start;
+                                //console.log('best',run_max_start,' ',run_max);
                             }
                             run_start   = i;                   // record the start of the run
                             run_value   = pixeldata[i];        // record the next comparison value as this value // AllanC - humm ... maybe this isnt enough?
                             run_length  = 0;                   // reset the number of matchs so far
                         }
+                        //console.log('i',i,'len',run_length);
                     }
-                    if (run_length > run_max) {        // had to duplicte this at the end, because the last one should always be checked and recorded if it's the longest
+                    //console.log('best_before',run_start,' ',run_length);
+                    if (run_length >= run_max) {        // had to duplicte this at the end, because the last one should always be checked and recorded if it's the longest
+                        c.fillStyle = "rgb(0,255,255)";
+                        c.fillRect(run_start  ,y_debug,1,5);
+                        
                         run_max       = run_length;
                         run_max_start = run_start;
+                        //console.log('best_final',run_max_start,' ',run_max);
                     }
-                    
+                    //console.log('yo', run_max_start);
                     return run_max_start;
                 }
                 
@@ -114,9 +132,15 @@
                 
                 //console.log(index_start);
                 //console.log(index_end  );
-                //c.fillStyle = "rgb(255,0,0)";
-                //c.fillRect(index_start,0,1,100);
-                //c.fillRect(index_end  ,0,1,100);
+                c.fillStyle = "rgb(255,255,0)";
+                c.fillRect(index_start  ,y_debug,1,5);
+                c.fillRect(index_end    ,y_debug,1,5);
+                
+                // Abort if no edge
+                if (index_start<=1 && index_end>=c.canvas.width-1 || index_end-index_start < 95) {
+                    //console.log('ABORT')
+                    return '';
+                }
                 
                 // Remove the edges
                 //   by sending seekers out from the center and finding the start pos of the longest run of the same colour
@@ -127,7 +151,7 @@
                 
                 // Get Bit size
                 var bit_size = pixeldata.length / 95;
-                console.log(bit_size);
+                //console.log(bit_size);
                 
                 // Take a descreate bit item location and attempt to recover the binary value at that point using aliasing
                 function get_bit(descreate_index) {
@@ -135,7 +159,7 @@
                     //offset = index - Math.round(index);
                     
                     c.fillStyle = "rgb(255,0,0)";
-                    c.fillRect(index_start+index,0,1,100);
+                    c.fillRect(index_start+index  ,y_debug,1,5);
                     
                     var count = 0;
                     var total = 0;
@@ -152,6 +176,7 @@
                 // Generate diget bit patterns
                 // EAN-13
                 // http://en.wikipedia.org/wiki/EAN-13
+                
                 bit_patterns = {
                     l: {
                         '0001101':0, // 0
@@ -166,7 +191,19 @@
                         '0001011':9, // 9
                     },
                     g: {},
-                    r: {}
+                    r: {},
+                    first: {
+                        'llllll':0,
+                        'llglgg':1,
+                        'llgglg':2,
+                        'llgggl':3,
+                        'lgllgg':4,
+                        'lggllg':5,
+                        'lgggll':6,
+                        'lglglg':7,
+                        'lglggl':8,
+                        'lgglgl':9,
+                    }
                 }
                 
                 // make r codes
@@ -227,116 +264,61 @@
                     return {type:'',val:''}
                 }
                 
-                var digits = '';
                 //console.log(get_didget(7));
+                digets = Array();
                 for (var i=0 ; i<12 ; i++) {
-                    digit = lookup_didget(get_didget(i))
-                    digits += digit.val;
-                    console.log(digit);
+                    digets.push(lookup_didget(get_didget(i)));
                 }
-		        callback(digits);
                 
-                return 0;
+                //EAN - first number lookup
+                var first_diget_lookup = '';
+                var first_diget        = '';
+                for (var i=0 ; i < head_didgets ; i++) {
+                    first_diget_lookup += digets[i]['type'];
+                }
+                if (typeof bit_patterns.first[first_diget_lookup] !== 'undefined') {
+                    first_diget = bit_patterns.first[first_diget_lookup];
+                }
+                
+                // Put number into string to return
+                var return_string = '';
+                return_string += first_diget;
+                for (var i=0 ; i < head_didgets ; i++) {
+                    return_string += digets[i]['val'];
+                }
+                for (var i=head_didgets ; i < head_didgets+foot_didgets ; i++) {
+                    if (digets[i]['type']=='r') {
+                        return_string += digets[i]['val'];
+                    }
+                    else {
+                        return_string += '-';
+                    }
+                }
+                
+                return return_string;
             }
             
-            /**
-            var line_spacing = 10; // Rather than reading EVERY line (too much processing), take one line every line_spacing
-            
+            var line_spacing = 40; // Rather than reading EVERY line (too much processing), take one line every line_spacing
             
             // Get horizontal lines of the canvas can regular intivals
             // The algoithum will be run on multiple horizontal lines
             // The most commonly occouring number is the one to validate
             var numbers = Array();
-            for (y=0 ; y<=c.canvas.height ; y+=line_spacing) {
+            for (y=40 ; y<=c.canvas.height ; y+=line_spacing) {
                 //numbers.push(read_number_from_pixeldata( pixeldata.slice(y*width*4, y*width+1*4) ));
-                var number = read_number_from_pixeldata( c.getImageData(0, y, c.canvas.width, 1).data );
+                var number = read_number_from_pixeldata( c.getImageData(0, y, c.canvas.width, 1).data, y );
                 numbers.push(number);
                 //console.log(number);
             }
             // find most common
             var number = most_frequent_value(numbers);
-            */
+
             
-            var number = read_number_from_pixeldata( c.getImageData(0, 100, c.canvas.width, 1).data );
+            //var number = read_number_from_pixeldata( c.getImageData(0, 40, c.canvas.width, 1).data );
             
             console.log(number);
             
             return number
-        }
-    
-
-//------------------------------------------------------------------------------
+        }//------------------------------------------------------------------------------
 
     
-        function draw() {
-            var canvas = document.getElementById("canvas");
-            if (canvas.getContext) {
-                var c = canvas.getContext("2d");
-    
-                
-                var i = new Image();
-                i.onload = function() {
-                    c.drawImage(i, 0, 0);
-                    console.log ('drawn');                  
-                    
-                }
-                i.src = "/barcode_test_1.png";
-                //i.src = "/5099750442227_2.png";
-
-            /**
-                                                 
-            */
-                
-                
-                
-                
-                
-                
-                //EAN-13
-                
-                //UPC-A
-                
-                // Draw the ImageData at the given (x,y) coordinates.
-                //c.putImageData(imgd, 0, 0);
-                
-            }
-        }
-        
-        function read(callback) {
-            var canvas = document.getElementById("canvas");
-            if (canvas.getContext) {
-                var c = canvas.getContext("2d");
-                read_barcode(c, callback);
-
-                /*
-                c.fillStyle = "rgb(40,0,0)";
-                c.fillRect (20, 20, 65, 60);
-                c.fillStyle = "rgba(0, 0, 160, 0.5)";
-                c.fillRect (40, 40, 65, 60);
-                
-
-                var imgd = c.getImageData(0, 0, c.canvas.width, c.canvas.height);
-                var pix = imgd.data;
-                
-                // Loop over each pixel and invert the color.
-                for (var i = 0, n = pix.length; i < n; i += 4) {
-                    pix[i  ] = 255 - pix[i  ]; // red
-                    pix[i+1] = 255 - pix[i+1]; // green
-                    pix[i+2] = 255 - pix[i+2]; // blue
-                    // i+3 is alpha (the fourth element)
-                }
-            
-                // Draw the ImageData at the given (x,y) coordinates.
-                c.putImageData(imgd, 0, 0);
-                */
-                
-                
-                //    c.getImageData(0, 0, c.canvas.width, c.canvas.height).data,
-                //    c.canvas.width,
-                //    c.canvas.height
-                //);
-                
-
-
-            }
-        }

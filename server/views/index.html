@@ -3,6 +3,29 @@
   function fillBarcode(digits) {
     $('#barcode_digits').val(digits)
   }
+  
+    function draw() {
+        var canvas = document.getElementById("canvas");
+        if (canvas.getContext) {
+            var c = canvas.getContext("2d");
+            
+            var i = new Image();
+            i.onload = function() {
+                c.drawImage(i, 0, 0);
+            }
+            i.src = "/barcode_test_1.png";
+            //i.src = "/5099750442227_2.png";                
+        }
+    }
+    
+    function read(callback) {
+        var canvas = document.getElementById("canvas");
+        if (canvas.getContext) {
+            var c = canvas.getContext("2d");
+            read_barcode(c, callback);
+        }
+    }
+
 </script>
 <form method="GET" action="/lookup" data-ajax="false">
   <div id="scanner-holder" style="text-align: center;">
