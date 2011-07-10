@@ -1,0 +1,13 @@
+if (typeof(DeviceInfo) != 'object')
+    DeviceInfo = {};
+
+function PhoneGap() {
+	ready = true;
+	available = true;
+	sceneController = null;
+};
+
+document.addEventListener('DOMContentLoaded', function () {
+    window.phonegap = new PhoneGap();
+    navigator.device.deviceReady();
+});

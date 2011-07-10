@@ -19,7 +19,10 @@ enyo.kind({
       subscribe : false,
     },
 
-    {kind: "PageHeader", content: "BarcodeThing"},
+    {kind: "PageHeader", layoutKind: "HFlexLayout", components: [
+      {kind:"Image", src:"logo.png"},
+      //{name: "appTitle", content: "BarcodeThing"},
+    ]},
     {kind: "RowGroup", caption: "Search for a barcode number", components: [
       {kind: "Input", components: [
         {kind: "Button", caption: "Search", onclick: "btnClick"},
