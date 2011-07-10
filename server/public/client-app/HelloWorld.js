@@ -14,11 +14,18 @@ enyo.kind({
       ]},
     ]},
     {kind: "Scroller", flex: 1, components: [
-      {name: "list", kind: "VirtualRepeater", onSetupRow: "getListItem",
+      {name: "list", kind: "VirtualRepeater", onSetupRow: "getListPlugin",
         components: [
           {kind: "Item", layoutKind: "VFlexLayout", components: [
-            {name: "title", kind: "Divider"},
-            {name: "description"}
+            {name: "pluginTitle", kind: "Divider"},
+            {name: "list_items", kind: "VirtualRepeater", onSetupRow: "getListPluginItem",
+              components: [
+                {kind: "Item", layoutKind: "VFlexLayout", components: [
+                  {name: "itemTitle"},
+                  {name: "description", kind: "HtmlContent", onLinkClick: "doLinkClick"}
+                ]},
+              ],
+            },
           ]},
         ],
       },
@@ -30,7 +37,6 @@ enyo.kind({
     this.$.getResults.call();
   },
   gotResults: function (inSender, inResponse) {
-    console.log (inResponse);
     this.results = inResponse;
     this.$.button.setCaption("Success");
     this.$.list.render();
@@ -39,11 +45,24 @@ enyo.kind({
     enyo.log("Got failure from API");
     this.$.button.setCaption("Failure");
   },
-  getListItem: function (inSender, inIndex) {
+  getListPlugin: function (inSender, inIndex) {
     r = this.results[inIndex];
     if (r) {
-      this.$.title.setCaption(r.plugin.charAt(0).toUpperCase() + r.plugin.slice(1));
-      this.$.description.setContent("This");
+      this.$.pluginTitle.setCaption(r.plugin.charAt(0).toUpperCase() + r.plugin.slice(1));
+      this.$.list_items.results = r.results;
+      this.$.list_items.resultsPlugin = r.plugin;
+      this.$.list_items.render();
+      return true;
+    }
+  },
+  getListPluginItem: function (inSender, inIndex) {
+    console.log (inSender, inIndex);
+    r = inSender.results[inIndex];
+    console.log (r);
+    if (r) {
+      this.$.itemTitle.setContent(r.title);
+      this.$.description.setContent(customRender[inSender.resultsPlugin](r));
+      console.log('Rendered');
       return true;
     }
   },
@@ -52,7 +71,7 @@ enyo.kind({
     this.results = [];
   }
 });
-
+/*
 enyo.kind({
   name: "enyo.Canon.ListItem",
   kind: enyo.VFlexLayout,
@@ -80,3 +99,15 @@ enyo.kind({
   layoutKind: enyo.VFlexLayout,
   components: [],
 });
+*/
+customRender = {
+  'youtube': function(data) {
+      return '<a href="' + data.playerurl + '">' + data.title + '</a>';
+    },
+  'ebay': function(data) {
+      return '<a href="' + data.viewItemURL + '">' + data.location + '<br /> &pound;' + data.sellingStatus[0].currentPrice[0].__value__ + ' + &pound;' + data.shippingInfo[0].shippingServiceCost[0].__value__ + ' P&P </a>';
+    },
+  'guardian': function(data) {
+      return '<a href="' + data.url + '">' + data.text + '</a>';
+    },
+  }
